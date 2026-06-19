@@ -5,7 +5,7 @@ import pandas as pd
 from datetime import datetime
 from prompt_builder import build_prompt
 from scraper import LinkedInScraper
-from config import OUTPUT_FILE
+from config import OUTPUT_FILE, PROFILE_DIR, PAGE_LOAD_WAIT, SCROLL_WAIT, run_timestamp
 
 
 os.makedirs("output",exist_ok=True)
@@ -34,18 +34,42 @@ for search in searches:
 
     print("\n====================")
 
-    print(f"Processing: "f"{search['company']}")
+    print(f"Processing: {search['company']}")
 
-    print("====================")
-    
-    prompt = build_prompt(search)
+    print( "====================")
+
     profiles = (scraper.scrape_search_url(prompt))
+
+    # =====================================
+    # Exact company match for CURRENT searches
+    # =====================================
+
+    if search["employment_type"] == "current":
+
+        target_company = (search["company"].strip().lower())
+        before_count = len(profiles)
+
+        profiles = [profile for profile in profiles if (profile.get("company", "").strip().lower()== target_company)]
+
+        print(f"Current company filter: {before_count} -> {len(profiles)}")
+
+    # =====================================
+    # Add metadata
+    # =====================================
 
     for profile in profiles:
 
-        profile[
-            "source_company"
-        ] = search["company"]
+        profile["source_company"] = (
+            search["company"]
+        )
+
+        profile["employment_type"] = (
+            search["employment_type"]
+        )
+
+        profile["search_prompt"] = (
+            prompt
+        )
 
     all_profiles.extend(
         profiles
@@ -82,17 +106,38 @@ print(
 # convert to dataframe using pandas
 df = pd.DataFrame(all_profiles)
 
+#deduplication based on profile_url
+unique_profiles = {}
+
+for profile in all_profiles:
+
+    unique_profiles[
+        profile["profile_url"]
+    ] = profile
+
+all_profiles = list(
+    unique_profiles.values()
+)
+
+print(
+    f"\nAfter Deduplication: "
+    f"{len(all_profiles)} profiles"
+)
+
 # store scrap time as a column
 scrape_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 df["scraped_at"] = scrape_time
 
 #to csv
-df.to_csv("output/profiles.csv", index=False, encoding="utf-8-sig")
-print("\nSaved: output/profiles.csv")
+csv_file = (f"output/profiles_{run_timestamp}.csv")
+
+df.to_csv(csv_file, index=False, encoding="utf-8-sig")
+print(f"\nSaved: {csv_file}")
 
 #to excel
-df.to_excel("output/profiles.xlsx", index=False)
-print("\nSaved: output/profiles.xlsx")
+excel_file = ( f"output/profiles_{run_timestamp}.xlsx")
+df.to_excel(excel_file, index=False)
+print(f"\nSaved: {excel_file}")
 
 print(
     f"TOTAL PROFILES: "

@@ -4,11 +4,7 @@ from selenium.webdriver.edge.options import Options
 from selenium.webdriver.common.keys import Keys
 import time
 
-from config import (
-    PROFILE_DIR,
-    PAGE_LOAD_WAIT,
-    SCROLL_WAIT
-)
+from config import (PROFILE_DIR,PAGE_LOAD_WAIT,SCROLL_WAIT)
 
 
 class LinkedInScraper:
