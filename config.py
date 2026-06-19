@@ -9,3 +9,5 @@ OUTPUT_FILE = f"output/profiles_{run_timestamp}.json"
 PAGE_LOAD_WAIT = 10
 
 SCROLL_WAIT = 2
+
+HEADLESS = True

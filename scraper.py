@@ -4,7 +4,7 @@ from selenium.webdriver.edge.options import Options
 from selenium.webdriver.common.keys import Keys
 import time
 
-from config import (PROFILE_DIR,PAGE_LOAD_WAIT,SCROLL_WAIT)
+from config import (PROFILE_DIR,PAGE_LOAD_WAIT,SCROLL_WAIT,HEADLESS)
 
 
 class LinkedInScraper:
@@ -16,6 +16,16 @@ class LinkedInScraper:
         options.add_argument(
             f"--user-data-dir={PROFILE_DIR}"
         )
+
+        if HEADLESS:
+
+            options.add_argument(
+                "--headless=new"
+            )
+
+            options.add_argument(
+                "--window-size=1920,1080"
+            )
 
         self.driver = webdriver.Edge(
             options=options
