@@ -1,30 +1,28 @@
 import json
 import os
+import sys
 import pandas as pd
 from datetime import datetime
 from prompt_builder import build_prompt
+from scraper import LinkedInScraper
+from config import OUTPUT_FILE
 
-from scraper import (
-    LinkedInScraper
-)
 
-from config import (
-    OUTPUT_FILE
-)
+os.makedirs("output",exist_ok=True)
 
-os.makedirs(
-    "output",
-    exist_ok=True
-)
+if len(sys.argv) < 2:
 
-with open(
-    "searches.json",
-    "r",
-    encoding="utf-8"
-) as f:
+    print("Usage: python main.py <config_file>")
+
+    exit()
+
+config_file = sys.argv[1]
+
+with open(config_file,"r", encoding="utf-8") as f:
 
     searches = json.load(f)
 
+print(f"\nLoading Config: "f"{config_file}\n")
 
 scraper = LinkedInScraper()
 
@@ -34,18 +32,12 @@ for search in searches:
 
     prompt = build_prompt(search)
 
-    print(
-        "\n===================="
-    )
+    print("\n====================")
 
-    print(
-        f"Processing: "
-        f"{search['company']}"
-    )
+    print(f"Processing: "f"{search['company']}")
 
-    print(
-        "===================="
-    )
+    print("====================")
+    
     prompt = build_prompt(search)
     profiles = (scraper.scrape_search_url(prompt))
 

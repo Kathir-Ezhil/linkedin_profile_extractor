@@ -256,64 +256,76 @@ class LinkedInScraper:
 
         self.search_company(prompt)
 
-        # -----------------
-        # PAGE 1
-        # -----------------
+        page_number = 1
 
-        print(
-            "\n===== PAGE 1 ====="
-        )
-
-        self.scrape_current_page(
-            profiles
-        )
-
-        print(
-            f"\nPage 1 Complete -> "
-            f"{len(profiles)} profiles"
-        )
-
-        # -----------------
-        # PAGE 2
-        # -----------------
-
-        try:
-
-            next_btn = (
-                self.driver.find_element(
-                    By.CSS_SELECTOR,
-                    "[data-test-pagination-next]"
-                )
-            )
-
-            self.driver.execute_script(
-                "arguments[0].click();",
-                next_btn
-            )
-
-            time.sleep(8)
-
-            self.driver.execute_script(
-                "window.scrollTo(0,0);"
-            )
-
-            time.sleep(2)
+        while True:
 
             print(
-                "\n===== PAGE 2 ====="
+                f"\n===== PAGE {page_number} ====="
             )
+
+            before_count = len(profiles)
 
             self.scrape_current_page(
                 profiles
             )
 
-        except Exception as e:
+            after_count = len(profiles)
 
             print(
-                "No next page"
+                f"Profiles collected: {after_count}"
             )
 
-            print(e)
+            try:
+
+                next_btn = self.driver.find_element(
+                    By.CSS_SELECTOR,
+                    "[data-test-pagination-next]"
+                )
+
+                if (
+                    not next_btn.is_displayed()
+                    or
+                    not next_btn.is_enabled()
+                ):
+                    print(
+                        "Next button disabled."
+                    )
+                    break
+
+                self.driver.execute_script(
+                    "arguments[0].click();",
+                    next_btn
+                )
+
+                print(
+                    f"Moving to page {page_number + 1}"
+                )
+
+                time.sleep(8)
+
+                self.driver.execute_script(
+                    "window.scrollTo(0,0);"
+                )
+
+                time.sleep(2)
+
+                page_number += 1
+                if page_number > 20:
+                    print("Reached page limit of 20.")
+                    break
+
+            except Exception as e:
+
+                print(
+                    "No more pages."
+                )
+
+                print(e)
+
+                break
+
+            
 
         return list(
             profiles.values()
