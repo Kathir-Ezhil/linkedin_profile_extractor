@@ -6,4 +6,5 @@ __pycache__/
 *.db
 driver/
 edge_profile/
+edge_profile_test/
 output/

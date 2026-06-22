@@ -4,6 +4,7 @@ import sys
 import pandas as pd
 from datetime import datetime
 from prompt_builder import build_prompt
+from profile_verifier import get_all_companies, worked_for_company
 from scraper import LinkedInScraper
 from config import OUTPUT_FILE, PROFILE_DIR, PAGE_LOAD_WAIT, SCROLL_WAIT, run_timestamp
 
@@ -52,6 +53,37 @@ for search in searches:
         profiles = [profile for profile in profiles if (profile.get("company", "").strip().lower()== target_company)]
 
         print(f"Current company filter: {before_count} -> {len(profiles)}")
+    
+    elif (search["employment_type"]== "past"):
+
+        before_count = len(profiles)
+        verified_profiles = []
+        for profile in profiles:
+
+            print(
+                f"Verifying: "
+                f"{profile['name']}"
+            )
+
+            companies = get_all_companies(
+                scraper.driver,
+                profile["profile_url"]
+            )
+
+            profile["all_companies"] = companies
+
+            if worked_for_company(companies,search["company"]):
+
+                verified_profiles.append(profile)
+                
+
+        profiles = verified_profiles
+
+        print(
+            f"Past company filter: "
+            f"{before_count} -> "
+            f"{len(profiles)}"
+        )
 
     # =====================================
     # Add metadata

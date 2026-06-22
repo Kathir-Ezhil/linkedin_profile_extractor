@@ -342,7 +342,9 @@ class LinkedInScraper:
             "https://www.linkedin.com/talent/home"
         )
 
-        time.sleep(8)
+        time.sleep(10)
+
+        
 
         search_box = self.driver.find_element(
             By.CSS_SELECTOR,
@@ -357,9 +359,7 @@ class LinkedInScraper:
 
         search_box.send_keys(Keys.ENTER)
 
-        print(
-            f"Searching: {prompt}"
-        )
+        print(f"Searching: {prompt}")
 
         time.sleep(10)
 
