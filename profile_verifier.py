@@ -73,20 +73,56 @@ def normalize_company(name):
 
     return name
 
+def worked_for_company(
+    companies,
+    target_company
+):
 
-def worked_for_company(companies,target_company):
+    print("\n" + "=" * 60)
+    print("TARGET COMPANY:", target_company)
+    print("=" * 60)
+
+    # ==================================
+    # SPECIAL RULE FOR RENCATA
+    # ==================================
+
+    if target_company.lower() == "rencata":
+
+        print("\nUSING RENCATA SEMANTIC MATCHING\n")
+
+        for company in companies:
+
+            company_norm = normalize_company(
+                company
+            )
+
+            print(
+                "COMPARE:",
+                repr(company_norm)
+            )
+
+            if "rencata" in company_norm:
+
+                print(
+                    f"MATCH FOUND -> "
+                    f"{company}"
+                )
+
+                return True
+
+        print("NO MATCH FOUND")
+
+        return False
+
+    # ==================================
+    # DEFAULT ALIAS MATCHING
+    # ==================================
 
     aliases = COMPANY_ALIASES.get(
         target_company,
         [target_company]
     )
 
-
-    target = (
-        target_company
-        .strip()
-        .lower()
-    )
     aliases = [
 
         normalize_company(alias)
@@ -94,12 +130,22 @@ def worked_for_company(companies,target_company):
         for alias in aliases
     ]
 
+    print("\nVALID ALIASES:")
 
-    print("\nTARGET =", repr(target))
+    for alias in aliases:
+
+        print(
+            " -",
+            alias
+        )
+
+    print()
 
     for company in companies:
 
-        company_norm = normalize_company(company)
+        company_norm = normalize_company(
+            company
+        )
 
         print(
             "COMPARE:",
@@ -108,8 +154,13 @@ def worked_for_company(companies,target_company):
 
         if company_norm in aliases:
 
-            print("MATCH FOUND")
+            print(
+                f"MATCH FOUND -> "
+                f"{company}"
+            )
 
             return True
+
+    print("NO MATCH FOUND")
 
     return False
